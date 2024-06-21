@@ -4,7 +4,7 @@ module.exports = {
     displayName: name,
     roots: ['.'],
     testMatch: [
-        "**/+(*.)+(test).+(js)"
+        "**/+(*.)+(e2e).+(js)"
     ],
     coveragePathIgnorePatterns: ['index.ts', 'node_modules', 'jest.config.js'],
     rootDir: '.',
