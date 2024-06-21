@@ -6,6 +6,28 @@ This project demonstrates setting up End-to-End (E2E) tests for both the fronten
 - **Backend E2E Test**: An Express server with Sequelize using an in-memory SQLite database. Tests run via Jest against a Supertest server without port listening and using an in-memory database.
 - **Frontend Testing**: Uses Playwright to serve a React static site via `serve-static` and mocks the API response using Playwright route interception to call the Supertest backend API (in-memory backend).
 
+## Project Structure
+
+```
+.
+├── backend
+│   ├── models
+│   │   └── index.js
+│   ├── server.js
+│   └── backend.e2e.js
+├── dist
+├── node_modules
+├── src
+│   ├── App.jsx
+│   └── main.jsx
+├── tests
+│   └── frontend.spec.js
+├── jest.config.js
+├── package.json
+├── playwright.config.js
+├── vite.config.js
+└── README.md
+```
 
 ## Diagram
 
@@ -20,6 +42,7 @@ Here is a PlantUML diagram to illustrate how this system works:
 3. **Express Server** retrieves user data from the **Sequelize** in-memory SQLite database.
 4. **Jest and Supertest** are used for end-to-end testing of the backend.
 5. **Playwright** serves the static React app and intercepts API calls to mock responses, enabling frontend testing with an in-memory backend.
+
 
 ## Debugging
 
