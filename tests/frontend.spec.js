@@ -2,56 +2,51 @@ const { test, expect } = require('@playwright/test');
 const app = require('../backend/server'); // Import your backend server
 const supertest = require('supertest');
 const path = require('path');
-const fs = require('fs');
+const serveStatic = require('serve-static');
+const http = require('http');
 
 let request;
+let server;
 
 test.beforeAll(async () => {
-    request = supertest(app);
+    // Initialize Supertest with the Express app
+    request = supertest(app); 
+    // Serve the built React application
+    const serve = serveStatic(path.join(__dirname, '../dist'), { index: ['index.html'] });
+    server = http.createServer((req, res) => serve(req, res, () => res.end()));
+    server.listen(3000, () => {
+        console.log('Static file server running on http://localhost:3000');
+    });
+});
+
+test.afterAll(() => {
+    if (server) {
+        server.close();
+    }
 });
 
 test('should display users on the frontend', async ({ page }) => {
-    const response = await request.get('/users');
-    console.log('API response:', response.body);
-
-    await page.route('**/*', async (route) => {
+    // Mock the API response using Playwright route interception
+    await page.route('**/users', async (route) => {
         console.log('Route Intercepted: ', route.request().url());
-        if (route.request().url().includes('/users')) {
-            const response = await request.get('/users');
-            console.log('Intercepted request response:', response.body); // Log for debugging
-            route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify(response.body)
-            });
-        } else {
-            route.continue();
-        }
+        const response = await request.get('/users');
+        console.log('Intercepted request response:', response.body);
+        route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(response.body)
+        });
     });
-  
-    // Serve the frontend static files directly
-    const indexPath = path.join(__dirname, '../dist/index.html');
-    const indexContent = fs.readFileSync(indexPath, 'utf8');
-    await page.setContent(indexContent, { waitUntil: 'load' });
 
-    
-    // await page.route('**/users', async (route) => {
-    //     console.log('page.route response:', response.body);
-    //     route.fulfill({
-    //         contentType: 'application/json',
-    //         body: JSON.stringify(response.body)
-    //     });
-    // });
-    
+    // Navigate to the static file server
+    await page.goto('http://localhost:3000');
 
     // Wait for the users to be rendered
-    await page.waitForSelector('ul#user-list li', { timeout: 5000 });
+    await page.waitForSelector('ul#user-list li');
 
     // Verify that the users are displayed correctly
-    const userElements = await page.locator('ul#user-list li'); // Replace with your actual selector
+    const userElements = await page.locator('ul#user-list li');
     const userNames = await userElements.allInnerTexts();
-    console.log('User names in the DOM:', userNames); // Log for debugging
+    console.log('User names in the DOM:', userNames);
     expect(userNames).toEqual(['Alice', 'Bob', 'Charlie']);
-
-  
 });
