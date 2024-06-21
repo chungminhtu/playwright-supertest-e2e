@@ -9,7 +9,6 @@ This project demonstrates setting up End-to-End (E2E) tests for both the fronten
 ## Project Structure
 
 ```
-.
 ├── backend
 │   ├── models
 │   │   └── index.js
