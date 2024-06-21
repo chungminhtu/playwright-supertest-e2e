@@ -1,14 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const { initializeDatabase, User } = require('./models');
+const {   User } = require('./models');
 
 const app = express();
+app.use(cors({    origin: '*'  }));
 
-app.use(cors({
-    origin: '*' // Allow all origins for simplicity
-}));
-
-initializeDatabase();
 
 app.get('/users', async (req, res) => {
     const users = await User.findAll();

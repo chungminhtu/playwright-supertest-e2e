@@ -17,14 +17,4 @@ const User = sequelize.define('User', {
     },
 });
 
-async function initializeDatabase() {
-    await sequelize.sync();
-
-    await User.bulkCreate([
-        { name: 'Alice' },
-        { name: 'Bob' },
-        { name: 'Charlie' },
-    ]);
-}
-
-module.exports = { sequelize, User, initializeDatabase };
+module.exports = { sequelize, User };
