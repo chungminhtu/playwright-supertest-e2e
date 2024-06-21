@@ -11,7 +11,7 @@ This project demonstrates setting up End-to-End (E2E) tests for both the fronten
 
 Here is a PlantUML diagram to illustrate how this system works:
 
-![alt text](diagram.png "web app architecture")
+![alt text](images/Architecture.png "web app architecture")
 
 ### Explanation
 
@@ -21,29 +21,11 @@ Here is a PlantUML diagram to illustrate how this system works:
 4. **Jest and Supertest** are used for end-to-end testing of the backend.
 5. **Playwright** serves the static React app and intercepts API calls to mock responses, enabling frontend testing with an in-memory backend.
 
+## Debugging
 
-## Project Structure
+### Debug normal via browser (need run backend and frontend separately)
 
-```
-.
-├── backend
-│   ├── models
-│   │   └── index.js
-│   ├── server.js
-│   └── backend.e2e.js
-├── dist
-├── node_modules
-├── src
-│   ├── App.jsx
-│   └── main.jsx
-├── tests
-│   └── frontend.spec.js
-├── jest.config.js
-├── package.json
-├── playwright.config.js
-├── vite.config.js
-└── README.md
-```
+![alt text](images/Frontend_Debug.png "Debug normal via browser ")
  
 ## Backend E2E Testing Guide
 
@@ -53,7 +35,7 @@ The backend E2E tests are designed to verify the functionality of the Express se
 
 ### Configuration
 
-- **Sequelize**: Configured to use an in-memory SQLite database.
+- **Sequelize ORM**: Configured to use an in-memory SQLite database.
 - **Express Server**: Provides a `/users` endpoint that returns a list of users from the database.
 - **Jest**: Configured to run the tests located in the `backend/backend.e2e.js` file.
 
@@ -70,7 +52,7 @@ The backend E2E tests are designed to verify the functionality of the Express se
 
 **backend/backend.e2e.js**:
 
-\`\`\`javascript
+```javascript
 const request = require('supertest');
 const app = require('./server');  
 const { sequelize, User, clearDatabase } = require('./models');
@@ -97,7 +79,14 @@ it('should fetch all users', async () => {
     expect(response.body[1].name).toBe('Bob');
     expect(response.body[2].name).toBe('Charlie');
 });
-\`\`\`
+```
+
+Run the frontend e2e test via command `npm run test:backend`
+
+### Result of backend e2e
+
+![alt text](images/Backend_Test.png "Run backend e2e")
+
 
 ## Frontend E2E Testing Guide
 
@@ -123,7 +112,7 @@ The frontend E2E tests are designed to verify the functionality of the React app
 
 **tests/frontend.spec.js**:
 
-\`\`\`javascript
+```javascript
 const { test, expect } = require('@playwright/test');
 const app = require('../backend/server'); // Import your backend server
 const supertest = require('supertest');
@@ -177,7 +166,21 @@ test('should display users on the frontend', async ({ page }) => {
     console.log('User names in the DOM:', userNames);
     expect(userNames).toEqual(['Alice', 'Bob', 'Charlie']);
 });
-\`\`\`
+```
+
+Run the frontend e2e test via command `npm run test:frontend:playwright`
+
+### Result of frontend e2e without ui
+
+![alt text](images/Frontend_Test_cli.png " Run frontend e2e without ui")
+
+
+Run the frontend e2e test with ui via command `npm run test:frontend:playwright:ui`
+
+### Result of frontend e2e with web UI
+
+![alt text](images/FrontEnd_Test.png " Run frontend e2e with ui")
+
 
 ## License
 
