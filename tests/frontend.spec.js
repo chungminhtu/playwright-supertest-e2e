@@ -11,6 +11,7 @@ let server;
 test.beforeAll(async () => {
     // Initialize Supertest with the Express app
     request = supertest(app); 
+    
     // Serve the built React application
     const serve = serveStatic(path.join(__dirname, '../dist'), { index: ['index.html'] });
     server = http.createServer((req, res) => serve(req, res, () => res.end()));

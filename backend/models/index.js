@@ -16,5 +16,18 @@ const User = sequelize.define('User', {
         allowNull: false,
     },
 });
+async function clearDatabase() {
+    await sequelize.drop(); // Drop all tables
+}
 
-module.exports = { sequelize, User };
+async function initializeDatabase() {
+    await sequelize.sync({});
+
+    await User.bulkCreate([
+        { name: 'Alice' },
+        { name: 'Bob' },
+        { name: 'Charlie' },
+    ]);
+}
+
+module.exports = { sequelize, User, initializeDatabase, clearDatabase };

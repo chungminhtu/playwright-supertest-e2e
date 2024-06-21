@@ -1,10 +1,11 @@
 
 const request = require('supertest');
 const app = require('./server');  
-const { sequelize, User } = require('./models');
+const { sequelize, User, clearDatabase } = require('./models');
 
 beforeAll(async () => {
-    await sequelize.sync({ force: true });  
+    await clearDatabase();
+    await sequelize.sync();
     await User.bulkCreate([
         { name: 'Alice' },
         { name: 'Bob' },

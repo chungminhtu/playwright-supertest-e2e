@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev:backend": "nodemon ./backend/server.js",
-    "test:backend": "jest",
+    "test:backend": "cross-env NODE_ENV=backend_e2e jest",
     "dev:frontend": "vite --open",
     "build:frontend": "vite build",
     "test:frontend:playwright": "cross-env NODE_ENV=test PWTEST_WATCH=1 playwright test",

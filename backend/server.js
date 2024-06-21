@@ -1,11 +1,15 @@
 const express = require('express');
 const cors = require('cors');
-const {   User } = require('./models');
+const { initializeDatabase, User } = require('./models');
 
 const app = express();
-app.use(cors({    origin: '*'  }));
 
-
+app.use(cors({
+    origin: '*' // Allow all origins for simplicity
+}));
+if (process.env.NODE_ENV !== 'backend_e2e') {
+    initializeDatabase();
+}
 app.get('/users', async (req, res) => {
     const users = await User.findAll();
     res.json(users);
