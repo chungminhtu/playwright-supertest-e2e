@@ -1,0 +1,36 @@
+{
+  "name": "playwright-supertest-e2e",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev:backend": "nodemon ./backend/server.js",
+    "dev:frontend": "vite --open",
+    "build:frontend": "vite build",
+    "test:playwright": "npm run build:frontend && playwright test",
+    "test:playwright:headed": "PLAYWRIGHT_HEADLESS=false npm run test:playwright",
+    "test:cypress": "cypress run"
+    
+  },
+  "dependencies": {
+    "@playwright/test": "^1.44.1",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "playwright": "^1.44.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "cypress": "^13.12.0",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "supertest": "^7.0.0",
+    "vite": "^5.0.8"
+  }
+}
