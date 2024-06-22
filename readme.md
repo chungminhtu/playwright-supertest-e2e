@@ -142,46 +142,29 @@ The frontend E2E tests are designed to verify the functionality of the React app
 const { test, expect } = require('@playwright/test');
 const app = require('../backend/server'); // Import your backend server
 const supertest = require('supertest');
-const path = require('path');
-const serveStatic = require('serve-static');
-const http = require('http');
 
 let request;
-let server;
 
 test.beforeAll(async () => {
     // Initialize Supertest with the Express app
     request = supertest(app); 
-
-    // Serve the built React application
-    const serve = serveStatic(path.join(__dirname, '../dist'), { index: ['index.html'] });
-    server = http.createServer((req, res) => serve(req, res, () => res.end()));
-    server.listen(3000, () => {
-        console.log('Static file server running on http://localhost:3000');
-    });
-});
-
-test.afterAll(() => {
-    if (server) {
-        server.close();
-    }
 });
 
 test('should display users on the frontend', async ({ page }) => {
     // Mock the API response using Playwright route interception
     await page.route('**/users', async (route) => {
         console.log('Route Intercepted: ', route.request().url());
-        const response = await request.get('/users');
+        const response = await request.get('/api/users');
         console.log('Intercepted request response:', response.body);
         route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify(response.body)
         });
-    });
+    }); 
 
     // Navigate to the static file server
-    await page.goto('http://localhost:3000');
+    await page.goto('http://localhost:3001/frontend');
 
     // Wait for the users to be rendered
     await page.waitForSelector('ul#user-list li');
@@ -192,6 +175,73 @@ test('should display users on the frontend', async ({ page }) => {
     console.log('User names in the DOM:', userNames);
     expect(userNames).toEqual(['Alice', 'Bob', 'Charlie']);
 });
+
+test('should display grid and roles on the frontend', async ({ page }) => {
+    await page.route('**/users', async (route) => {
+        const response = await request.get('/api/users');
+        route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(response.body),
+        });
+    });
+
+    await page.route('**/roles?type=admin', async (route) => {
+        const response = await request.get('/api/roles?type=admin');
+        route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(response.body),
+        });
+    });
+
+    await page.route('**/roles?type=editor', async (route) => {
+        const response = await request.get('/api/roles?type=editor');
+        route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(response.body),
+        });
+    });
+
+    await page.route('**/roles?type=viewer', async (route) => {
+        const response = await request.get('/api/roles?type=viewer');
+        route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(response.body),
+        });
+    });
+
+    await page.goto('http://localhost:3001/frontend/grid');
+
+    // Verify the <h1> element
+    await page.waitForSelector('h1', { state: 'visible' });
+    await expect(page.locator('h1')).toHaveText('User Grid');
+
+    // Verify the table rows and content
+    const rows = page.locator('table tbody tr');
+    await expect(rows).toHaveCount(3);
+
+    const expectedUsers = ['Alice', 'Bob', 'Charlie'];
+    for (let i = 0; i < expectedUsers.length; i++) {
+        const row = rows.nth(i);
+        await expect(row.locator('td').nth(0)).toHaveText(expectedUsers[i]);
+
+        const typeSelect = row.locator('td').nth(1).locator('select');
+        await expect(typeSelect).toHaveCount(1);
+
+        const roleSelect = row.locator('td').nth(2).locator('select');
+        await expect(roleSelect).toHaveCount(1);
+    }
+
+    // Additional verification of select options if needed
+    const typeOptions = ['Admin', 'Editor', 'Viewer'];
+    for (let i = 0; i < typeOptions.length; i++) {
+        await expect(rows.nth(0).locator('td').nth(1).locator('select').locator('option').nth(i)).toHaveText(typeOptions[i]);
+    }
+});
+
 ```
 
 Run the frontend e2e test via command `npm run test:frontend:playwright`
