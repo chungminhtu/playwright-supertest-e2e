@@ -1,10 +1,16 @@
-
-# Full In-Memory E2E Testing for Frontend and Backend
+# Full In-Memory End-to-End Testing for Frontend and Backend
 
 This project demonstrates setting up End-to-End (E2E) tests for both the frontend and backend, all running in-memory, making it friendly for CI/CD pipelines.
 
 - **Backend E2E Test**: An Express server with Sequelize using an in-memory SQLite database. Tests run via Jest against a Supertest server without port listening and using an in-memory database.
 - **Frontend Testing**: Uses Playwright to serve a React static site via `serve-static` and mocks the API response using Playwright route interception to call the Supertest backend API (in-memory backend).
+
+# Why End-to-End?
+
+Below are a few Comparison between End-to-End Testing Vs Component Testing
+
+![](images/e2e_vs_component.png)
+(Image source: [https://kailash-pathak.medium.com/lets-get-start-playwright-as-component-testing-4c82ffaadb7c](https://kailash-pathak.medium.com/lets-get-start-playwright-as-component-testing-4c82ffaadb7chttps:/))
 
 ## Project Structure
 
@@ -42,13 +48,12 @@ Here is a PlantUML diagram to illustrate how this system works:
 4. **Jest and Supertest** are used for end-to-end testing of the backend.
 5. **Playwright** serves the static React app and intercepts API calls to mock responses, enabling frontend testing with an in-memory backend.
 
-
 ## Debugging
 
 ### Debug normal via browser (need run backend and frontend separately)
 
 ![alt text](images/Frontend_Debug.png "Debug normal via browser ")
- 
+
 ## Backend E2E Testing Guide
 
 ### Overview
@@ -108,7 +113,6 @@ Run the frontend e2e test via command `npm run test:backend`
 ### Result of backend e2e
 
 ![alt text](images/Backend_Test.png "Run backend e2e")
-
 
 ## Frontend E2E Testing Guide
 
@@ -196,14 +200,13 @@ Run the frontend e2e test via command `npm run test:frontend:playwright`
 
 ![alt text](images/Frontend_Test_cli.png " Run frontend e2e without ui")
 
-
 Run the frontend e2e test with ui via command `npm run test:frontend:playwright:ui`
 
 ### Result of frontend e2e with web UI
 
 ![alt text](images/FrontEnd_Test.png " Run frontend e2e with ui")
 
-
 ## License
+
 ©2024 Chung Minh Tu
 This project is licensed under the MIT License.

@@ -23,7 +23,7 @@ afterAll(async () => {
 });
 
 it('should fetch all users', async () => {
-    const response = await request(app).get('/users');
+    const response = await request(app).get('/api/users');
     expect(response.status).toBe(200);
     expect(response.body).toHaveLength(3);
     expect(response.body[0].name).toBe('Alice');
@@ -32,7 +32,7 @@ it('should fetch all users', async () => {
 });
 
 it('should fetch roles based on user type', async () => {
-    const response = await request(app).get('/roles?type=admin');
+    const response = await request(app).get('/api/roles?type=admin');
     expect(response.status).toBe(200);
     expect(response.body).toHaveLength(2);
     expect(response.body[0].role).toBe('Super Admin');

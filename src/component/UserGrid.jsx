@@ -5,13 +5,13 @@ function UserGrid() {
     const [roles, setRoles] = useState({});
 
     useEffect(() => {
-        fetch('http://localhost:3001/users')
+        fetch('http://localhost:3000/api/users')
             .then(response => response.json())
             .then(data => setUsers(data));
     }, []);
 
     const handleUserTypeChange = (userId, type) => {
-        fetch(`http://localhost:3001/roles?type=${type}`)
+        fetch(`http://localhost:3000/api/roles?type=${type}`)
             .then(response => response.json())
             .then(data => setRoles(prev => ({ ...prev, [userId]: data })));
     };

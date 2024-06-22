@@ -1,50 +1,15 @@
 const { test, expect } = require('@playwright/test');
 const app = require('../backend/server'); // Import your backend server
 const supertest = require('supertest');
-const path = require('path');
-const serveStatic = require('serve-static');
-const http = require('http');
-const net = require('net');
-
 let request;
-let server;
-
-async function isPortInUse(port) {
-    return new Promise((resolve) => {
-        const tester = net.createServer()
-            .once('error', err => (err.code === 'EADDRINUSE' ? resolve(true) : resolve(false)))
-            .once('listening', () => tester.once('close', () => resolve(false)).close())
-            .listen(port);
-    });
-}
-
 test.beforeAll(async () => {
     // Initialize Supertest with the Express app
     request = supertest(app);
-
-    const portInUse = await isPortInUse(3000);
-
-    if (!portInUse) {
-        // Serve the built React application
-        const serve = serveStatic(path.join(__dirname, '../dist'), { index: ['index.html'] });
-        server = http.createServer((req, res) => serve(req, res, () => res.end()));
-        server.listen(3000, () => {
-            console.log('Static file server running on http://localhost:3000');
-        });
-    } else {
-        console.log('Port 3000 is already in use.');
-    }
-});
-
-test.afterAll(() => {
-    if (server) {
-        server.close();
-    }
 });
 
 test('should display grid and roles on the frontend', async ({ page }) => {
     await page.route('**/users', async (route) => {
-        const response = await request.get('/users');
+        const response = await request.get('/api/users');
         route.fulfill({
             status: 200,
             contentType: 'application/json',
@@ -53,7 +18,7 @@ test('should display grid and roles on the frontend', async ({ page }) => {
     });
 
     await page.route('**/roles?type=admin', async (route) => {
-        const response = await request.get('/roles?type=admin');
+        const response = await request.get('/api/roles?type=admin');
         route.fulfill({
             status: 200,
             contentType: 'application/json',
@@ -62,7 +27,7 @@ test('should display grid and roles on the frontend', async ({ page }) => {
     });
 
     await page.route('**/roles?type=editor', async (route) => {
-        const response = await request.get('/roles?type=editor');
+        const response = await request.get('/api/roles?type=editor');
         route.fulfill({
             status: 200,
             contentType: 'application/json',
@@ -71,7 +36,7 @@ test('should display grid and roles on the frontend', async ({ page }) => {
     });
 
     await page.route('**/roles?type=viewer', async (route) => {
-        const response = await request.get('/roles?type=viewer');
+        const response = await request.get('/api/roles?type=viewer');
         route.fulfill({
             status: 200,
             contentType: 'application/json',
@@ -79,7 +44,7 @@ test('should display grid and roles on the frontend', async ({ page }) => {
         });
     });
 
-    await page.goto('http://localhost:3000/grid');
+    await page.goto('http://localhost:3000/frontend/grid');
 
     // Verify the <h1> element
     await page.waitForSelector('h1', { state: 'visible' });
