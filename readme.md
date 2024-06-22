@@ -205,5 +205,5 @@ Run the frontend e2e test with ui via command `npm run test:frontend:playwright:
 
 
 ## License
-
+©2024 Chung Minh Tu
 This project is licensed under the MIT License.
