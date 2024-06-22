@@ -1,33 +1,55 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-// const sequelize = new Sequelize( {
-//     dialect: 'sqlite',
-//     storage:'test.db',
-//     logging: false,
-// });
-
+// Initialize Sequelize with in-memory SQLite using the correct URL format
 const sequelize = new Sequelize('sqlite::memory:', {
-    logging: false, 
+    logging: false,
 });
 
+// Define the User model
 const User = sequelize.define('User', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    role: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
 });
-async function clearDatabase() {
-    await sequelize.drop(); // Drop all tables
-}
+
+// Define the Role model
+const Role = sequelize.define('Role', {
+    type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    role: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+});
 
 async function initializeDatabase() {
-    await sequelize.sync({});
-
+    await sequelize.sync();
     await User.bulkCreate([
-        { name: 'Alice' },
-        { name: 'Bob' },
-        { name: 'Charlie' },
+        { name: 'Alice', type: 'admin' },
+        { name: 'Bob', type: 'editor' },
+        { name: 'Charlie', type: 'viewer' },
+    ]);
+    await Role.bulkCreate([
+        { type: 'admin', role: 'Super Admin' },
+        { type: 'admin', role: 'Admin' },
+        { type: 'editor', role: 'Content Editor' },
+        { type: 'viewer', role: 'Viewer' },
     ]);
 }
 
-module.exports = { sequelize, User, initializeDatabase, clearDatabase };
+async function clearDatabase() {
+    await sequelize.drop();
+}
+
+module.exports = { sequelize, User, Role, initializeDatabase, clearDatabase };
