@@ -10,7 +10,7 @@
     "build:frontend": "vite build",
     "test:frontend:playwright": "cross-env NODE_ENV=test PWTEST_WATCH=1 playwright test",
     "test:frontend:playwright:ui": "cross-env NODE_ENV=test PWTEST_WATCH=1 playwright test --ui",
-    "install": "pnpm i"
+    "install_dependencies": "pnpm i"
   },
   "dependencies": {
     "axios": "^1.7.2",
