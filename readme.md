@@ -5,6 +5,8 @@ This project demonstrates setting up End-to-End (E2E) tests for both the fronten
 - **Backend E2E Test**: An Express server with Sequelize using an in-memory SQLite database. Tests run via Jest against a Supertest server without port listening and using an in-memory database.
 - **Frontend Testing**: Uses Playwright to serve a React static site via `serve-static` and mocks the API response using Playwright route interception to call the Supertest backend API (in-memory backend).
 
+> Notice: This project use '**pnpm**' and not '**npm**' package manager.
+
 # Why End-to-End?
 
 Below are a few Comparison between End-to-End Testing Vs Component Testing
