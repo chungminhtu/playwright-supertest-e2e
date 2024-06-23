@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+const config = require('../../config');
 
 function UserGrid() {
     const [users, setUsers] = useState([]);
@@ -11,19 +12,19 @@ function UserGrid() {
     }, []);
 
     const fetchUsers = () => {
-        fetch('http://localhost:3000/api/users')
+        fetch(`http://localhost:${config.PORT}/api/users`)
             .then(response => response.json())
             .then(data => setUsers(data));
     };
 
     const handleUserTypeChange = (userId, type) => {
-        fetch(`http://localhost:3000/api/roles?type=${type}`)
+        fetch(`http://localhost:${config.PORT}/api/roles?type=${type}`)
             .then(response => response.json())
             .then(data => setRoles(prev => ({ ...prev, [userId]: data })));
     };
 
     const handleAddUser = () => {
-        fetch('http://localhost:3000/api/users', {
+        fetch(`http://localhost:${config.PORT}/api/users`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newUser),
@@ -40,7 +41,7 @@ function UserGrid() {
     };
 
     const handleUpdateUser = () => {
-        fetch(`http://localhost:3000/api/users/${editingUser.id}`, {
+        fetch(`http://localhost:${config.PORT}/api/users/${editingUser.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(editingUser),
@@ -53,7 +54,7 @@ function UserGrid() {
     };
 
     const handleDeleteUser = (userId) => {
-        fetch(`http://localhost:3000/api/users/${userId}`, {
+        fetch(`http://localhost:${config.PORT}/api/users/${userId}`, {
             method: 'DELETE',
         })
             .then(() => fetchUsers());

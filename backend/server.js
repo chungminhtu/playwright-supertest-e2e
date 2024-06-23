@@ -3,6 +3,7 @@ const path = require('path');
 const { initializeDatabase, User, Role, clearDatabase } = require('./models');
 const cors = require('cors');
 const net = require('net');
+const PORT = require('../config');
 
 const app = express();
 app.use(cors({
@@ -55,10 +56,7 @@ app.get('/api/roles', async (req, res) => {
     res.json(roles);
 });
 
-let PORT = process.env.PORT || 3000;
-if (process.env.NODE_ENV === 'frontend_e2e' || process.env.NODE_ENV === 'backend_e2e') {
-    PORT = 3001
-}
+console.log('mmmmmmmmmmmmmmmmmmmmmm', PORT);
 
 
 const server = net.createServer().listen(PORT);

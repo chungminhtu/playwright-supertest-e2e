@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
+const config = require('../config');
 
 function App() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/users')
+    fetch(`http://localhost:${config.PORT}/api/users`)
       .then(response => {
         return response.json();
       })
