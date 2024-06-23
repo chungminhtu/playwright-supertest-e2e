@@ -21,6 +21,33 @@ app.get('/api/users', async (req, res) => {
     res.json(users);
 });
 
+
+app.post('/api/users', async (req, res) => {
+    console.log(req.body);
+    const newUser = await User.create(req.body);
+    res.json(newUser);
+});
+
+app.put('/api/users/:id', async (req, res) => {
+    const user = await User.findByPk(req.params.id);
+    if (user) {
+        await user.update(req.body);
+        res.json(user);
+    } else {
+        res.status(404).json({ error: 'User not found' });
+    }
+});
+
+app.delete('/api/users/:id', async (req, res) => {
+    const user = await User.findByPk(req.params.id);
+    if (user) {
+        await user.destroy();
+        res.json({ message: 'User deleted' });
+    } else {
+        res.status(404).json({ error: 'User not found' });
+    }
+});
+
 app.get('/api/roles', async (req, res) => {
     const { type } = req.query;
     const roles = await Role.findAll({ where: { type } });
