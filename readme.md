@@ -77,7 +77,7 @@ The backend E2E tests are designed to verify the functionality of the Express se
 
 **Tests**
 
-1. Verify that the `/users` endpoint returns the correct list of users.
+Verify that the `/users` endpoint returns the correct list of users.
 
 **backend/backend.e2e.js**:
 
@@ -129,44 +129,59 @@ The frontend E2E tests are designed to verify the functionality of the React app
 
 ### Test File: `tests/frontend.spec.js`
 
-**Setup**
+1. Verify that the React application correctly CRUD the list of users fetched from the backend.
 
-1. Serve the built React application using `serve-static`.
-2. Use Playwright to mock API responses by intercepting network requests.
-
-**Tests**
-
-1. Verify that the React application correctly displays the list of users fetched from the backend.
-
-**tests/frontend.spec.js**:
+**tests/fixtures.js**
+This is a common setup across all the test to help Playwright to mock API responses by intercepting all the requests automatically to Supertest backend.
 
 ```javascript
-const { test, expect } = require('@playwright/test');
-const app = require('../backend/server'); // Import your backend server
+const base = require('@playwright/test');
+const app = require('../backend/server');
 const supertest = require('supertest');
+const request = supertest(app);
 
-let request;
-
-test.beforeAll(async () => {
-    // Initialize Supertest with the Express app
-    request = supertest(app); 
+exports.test = base.test.extend({
+    page: async ({ page }, use) => {
+        await page.route('**/api/**', async (route) => {
+            const method = route.request().method();
+            const url = new URL(route.request().url());
+            const pathname = url.pathname;
+            let response;
+            if (method === 'GET') {
+                response = await request.get(pathname + url.search);
+            } else if (method === 'POST') {
+                const postData = JSON.parse(route.request().postData());
+                response = await request.post(pathname).send(postData);
+            } else if (method === 'PUT') {
+                const putData = JSON.parse(route.request().postData());
+                response = await request.put(pathname).send(putData);
+            } else if (method === 'DELETE') {
+                response = await request.delete(pathname);
+            }
+            route.fulfill({
+                status: response.status,
+                contentType: 'application/json',
+                body: JSON.stringify(response.body),
+            });
+        });
+        await use(page);
+    },
 });
 
-test('should display users on the frontend', async ({ page }) => {
-    // Mock the API response using Playwright route interception
-    await page.route('**/users', async (route) => {
-        console.log('Route Intercepted: ', route.request().url());
-        const response = await request.get('/api/users');
-        console.log('Intercepted request response:', response.body);
-        route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify(response.body)
-        });
-    }); 
+exports.expect = base.expect;
 
-    // Navigate to the static file server
-    await page.goto('http://localhost:3001/frontend');
+```
+
+**tests/frontend.spec.js**:
+create test using the fixtures above `const { test, expect } = require('./fixtures');`
+
+```javascript
+const { test, expect } = require('./fixtures');
+
+test('should display users on the frontend', async ({ page }) => {
+
+    // Navigate to the static file server   
+    await page.goto(`http://localhost:3001/frontend`);
 
     // Wait for the users to be rendered
     await page.waitForSelector('ul#user-list li');
@@ -178,42 +193,8 @@ test('should display users on the frontend', async ({ page }) => {
     expect(userNames).toEqual(['Alice', 'Bob', 'Charlie']);
 });
 
+
 test('should display grid and roles on the frontend', async ({ page }) => {
-    await page.route('**/users', async (route) => {
-        const response = await request.get('/api/users');
-        route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify(response.body),
-        });
-    });
-
-    await page.route('**/roles?type=admin', async (route) => {
-        const response = await request.get('/api/roles?type=admin');
-        route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify(response.body),
-        });
-    });
-
-    await page.route('**/roles?type=editor', async (route) => {
-        const response = await request.get('/api/roles?type=editor');
-        route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify(response.body),
-        });
-    });
-
-    await page.route('**/roles?type=viewer', async (route) => {
-        const response = await request.get('/api/roles?type=viewer');
-        route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify(response.body),
-        });
-    });
 
     await page.goto('http://localhost:3001/frontend/grid');
 
@@ -243,7 +224,7 @@ test('should display grid and roles on the frontend', async ({ page }) => {
         await expect(rows.nth(0).locator('td').nth(1).locator('select').locator('option').nth(i)).toHaveText(typeOptions[i]);
     }
 });
-
+ 
 ```
 
 Run the frontend e2e test via command `npm run test:frontend:playwright`
@@ -258,7 +239,12 @@ Run the frontend e2e test with ui via command `npm run test:frontend:playwright:
 
 ![alt text](images/FrontEnd_Test.png " Run frontend e2e with ui")
 
-## License
+# Some notes to take
+
+- The test now still require open port and host frontend via http so Playwright can interact with React normaly (React-Routing need js in browser), and cannot serve entirely in RAM memory yet. Playwright support hosting static site but not Single page app like React yet.
+- Backend is entirely host and test via in-memory already.
+
+# License
 
 ©2024 Chung Minh Tu
 This project is licensed under the MIT License.
