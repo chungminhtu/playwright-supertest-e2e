@@ -1,7 +1,6 @@
 const base = require('@playwright/test');
 const app = require('../backend/server');
 const supertest = require('supertest');
-
 const request = supertest(app);
 
 exports.test = base.test.extend({
@@ -29,7 +28,7 @@ exports.test = base.test.extend({
             });
         });
         await use(page);
-    }
+    },
 });
 
 exports.expect = base.expect;

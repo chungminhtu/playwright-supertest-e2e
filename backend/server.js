@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { initializeDatabase, User, Role } = require('./models');
+const { initializeDatabase, User, Role, clearDatabase } = require('./models');
 const cors = require('cors');
 const net = require('net');
 
@@ -8,6 +8,7 @@ const app = express();
 app.use(cors({
     origin: '*',
 }));
+app.use(express.json());
 
 app.use('/frontend', express.static(path.join(__dirname, '../dist')));
 
@@ -65,9 +66,7 @@ const server = net.createServer().listen(PORT);
 server.on('listening', function () {
     server.close();
     if (process.env.NODE_ENV !== 'backend_e2e') {
-        initializeDatabase().then(() => {
-            console.log('Database initialized');
-        });
+        initializeDatabase() ;
         app.listen(PORT, () => {
             console.log(`Backend server is running on http://localhost:${PORT}`);
         });
@@ -76,6 +75,7 @@ server.on('listening', function () {
 
 server.on('error', function (err) {
     if (err.code === 'EADDRINUSE') {
+        initializeDatabase();
         console.log(`Port ${PORT} is already in use`);
     } else {
         throw err;
